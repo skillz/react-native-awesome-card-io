@@ -6,36 +6,58 @@ def safeExtGet(prop, fallback) {
 
 buildscript {
     repositories {
+        maven { url "https://maven.google.com" }
+        jcenter()
+        google()
         maven {
             url 'https://maven.google.com/'
             name 'Google'
         }
-        jcenter()
+        maven {
+            url "https://maven.fabric.io/public"
+        }
+        mavenCentral()
+        maven {
+            url 'http://nexus.skillz.com/content/groups/public'
+        }
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.2.1'
+        classpath 'com.android.tools.build:gradle:3.5.3'
     }
 }
 
 allprojects {
     repositories {
+        mavenLocal()
+        maven { url "https://maven.google.com" }
         jcenter()
-        maven { url "$projectDir/../node_modules/react-native/android" }
+        google()
+        maven {
+            // All of React Native (JS, Obj-C sources, Android binaries) is installed from npm
+            url "$rootDir/../node_modules/react-native/android"
+        }
+        maven {
+            url 'https://maven.google.com/'
+            name 'Google'
+        }
+        maven {
+            url 'http://nexus.skillz.com/content/groups/public'
+        }
     }
 }
 
 apply plugin: 'com.android.library'
 
 android {
-    compileSdkVersion safeExtGet('compileSdkVersion', 27)
+    compileSdkVersion safeExtGet('compileSdkVersion', 28)
 
     defaultConfig {
         minSdkVersion safeExtGet('minSdkVersion', 16)
-        targetSdkVersion safeExtGet('targetSdkVersion', 27)
+        targetSdkVersion safeExtGet('targetSdkVersion', 28)
         versionCode 1
         versionName "1.0"
         ndk {
-            abiFilters "armeabi-v7a", "x86"
+            abiFilters "armeabi-v7a", "x86", "arm64-v8a", "x86_64"
         }
     }
     lintOptions {
@@ -43,15 +65,7 @@ android {
     }
 }
 
-repositories {
-    mavenCentral()
-    maven {
-        url 'https://maven.google.com/'
-        name 'Google'
-    }
-}
-
 dependencies {
-    compileOnly "com.facebook.react:react-native:${safeExtGet('reactNativeVersion', '+')}"
-    implementation 'io.card:android-sdk:5.5.1'
+    api 'com.facebook.react:react-native:0.59.10'
+    implementation files('libs/card.io-6.0.aar')
 }
