@@ -3,6 +3,7 @@ package com.cardio;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Color;
+import android.util.Log;
 
 import com.facebook.react.bridge.ActivityEventListener;
 import com.facebook.react.bridge.Arguments;
@@ -16,15 +17,14 @@ import com.facebook.react.bridge.WritableMap;
 import io.card.payment.CardIOActivity;
 import io.card.payment.CreditCard;
 
-public class RNCardIOModule extends ReactContextBaseJavaModule implements ActivityEventListener {
+public class RNCardIOModule extends ReactContextBaseJavaModule {
 
-  public static final int CARD_IO_SCAN = 1;
+  public static final int CARD_IO_SCAN = 551;
 
-  private Promise promise;
+  private static Promise promise;
 
   public RNCardIOModule(ReactApplicationContext reactContext) {
     super(reactContext);
-    reactContext.addActivityEventListener(this);
   }
 
   @Override
@@ -34,7 +34,7 @@ public class RNCardIOModule extends ReactContextBaseJavaModule implements Activi
 
   @ReactMethod
   public void scanCard(ReadableMap config, Promise promise) {
-    this.promise = promise;
+    RNCardIOModule.promise = promise;
     Activity activity = getCurrentActivity();
     Intent scanIntent = new Intent(activity, CardIOActivity.class);
     scanIntent.putExtra(CardIOActivity.EXTRA_REQUIRE_EXPIRY, true);
@@ -99,8 +99,7 @@ public class RNCardIOModule extends ReactContextBaseJavaModule implements Activi
     }
   }
 
-  @Override
-  public void onActivityResult(Activity activity, int requestCode, int resultCode, Intent data) {
+  public static void handleActivityResult(int requestCode, Intent data) {
     if (requestCode != CARD_IO_SCAN) {
       return;
     }
@@ -120,7 +119,4 @@ public class RNCardIOModule extends ReactContextBaseJavaModule implements Activi
       promise.reject("user_cancelled", "The user cancelled");
     }
   }
-
-  @Override
-  public void onNewIntent(Intent intent) {}
 }
